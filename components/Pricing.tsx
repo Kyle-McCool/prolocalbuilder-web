@@ -39,7 +39,7 @@ function PricingCard({ tier }: { tier: Tier }) {
       className={[
         "relative flex h-full flex-col rounded-lg border bg-white p-9 transition-shadow duration-200",
         tier.featured
-          ? "border-2 border-orange-500 shadow-featured md:-translate-y-2 hover:shadow-[0_8px_20px_rgba(242,107,31,0.18)]"
+          ? "border-2 border-orange-500 shadow-featured hover:shadow-[0_8px_20px_rgba(242,107,31,0.18)]"
           : "border-ink-200 shadow-card hover:shadow-card-hover hover:border-ink-300",
       ].join(" ")}
     >
@@ -93,23 +93,25 @@ function PricingCard({ tier }: { tier: Tier }) {
         <span className="font-semibold">Best for:</span> {tier.bestFor}
       </p>
 
-      <Link
-        href="/#quote"
-        className={[
-          "btn btn-block",
-          tier.featured ? "btn-primary" : "btn-secondary",
-        ].join(" ")}
-      >
-        Get a {tier.name} quote
-      </Link>
+      <div className="mt-auto">
+        <Link
+          href="/#quote"
+          className={[
+            "btn btn-block",
+            tier.featured ? "btn-primary" : "btn-secondary",
+          ].join(" ")}
+        >
+          Get a {tier.name} quote
+        </Link>
 
-      <p className="mt-4 border-t border-ink-100 pt-4 text-center text-body-sm text-ink-700">
-        or{" "}
-        <span className="font-mono font-semibold text-ink-900">
-          ${tier.monthlyPrice}/mo
-        </span>{" "}
-        · {tier.monthlyTerm} months · then it's yours
-      </p>
+        <p className="mt-4 border-t border-ink-100 pt-4 text-center text-body-sm text-ink-700">
+          or{" "}
+          <span className="font-mono font-semibold text-ink-900">
+            ${tier.monthlyPrice}/mo
+          </span>{" "}
+          · {tier.monthlyTerm} months · then it's yours
+        </p>
+      </div>
     </div>
   );
 }

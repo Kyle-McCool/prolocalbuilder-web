@@ -8,8 +8,8 @@ export const site = {
   description:
     "Affordable website design for local businesses. One-time flat fee from $895 — no monthly payments, no contracts. Done in a week. Serving Wisconsin, the Bay Area, and Las Vegas.",
   contact: {
-    phone: "(408) 634-0404",
-    phoneHref: "tel:+14086340404",
+    phone: "(408) 908-9940",
+    phoneHref: "tel:+14089089940",
     email: "hello@prolocalbuilder.com",
     emailHref:
       "mailto:hello@prolocalbuilder.com?subject=Free%20quote%20for%20my%20business&body=Hi%2C%0A%0AMy%20business%3A%20%0AWhat%20I%20do%3A%20%0AMy%20current%20website%20(if%20any)%3A%20%0ATier%20I%27m%20interested%20in%3A%20%0A%0AThanks%2C",
