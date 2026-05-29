@@ -117,6 +117,15 @@ export function CTA() {
               autoComplete="name"
             />
             <Field
+              id="quote-email"
+              name="email"
+              label="Email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="you@example.com"
+            />
+            <Field
               id="quote-business"
               name="business"
               label="Business name"

@@ -45,15 +45,24 @@ export async function POST(req: Request) {
   }
 
   const name = str(form.get("name"));
+  const email = str(form.get("email"));
   const business = str(form.get("business"));
   const city = str(form.get("city"));
   const phone = str(form.get("phone"));
   const details = str(form.get("details"));
 
   // Mirror the form's required fields.
-  if (!name || !business || !city) {
+  if (!name || !email || !business || !city) {
     return NextResponse.json(
-      { error: "Please fill in your name, business, and city." },
+      { error: "Please fill in your name, email, business, and city." },
+      { status: 400 }
+    );
+  }
+
+  // Basic shape check — the browser validates type="email", but bots skip it.
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json(
+      { error: "Please enter a valid email address." },
       { status: 400 }
     );
   }
@@ -63,6 +72,7 @@ export async function POST(req: Request) {
   const subject = `New quote request — ${business} (${city})`;
   const lines = [
     `Name: ${name}`,
+    `Email: ${email}`,
     `Business: ${business}`,
     `City: ${city}`,
     `Phone: ${phone || "—"}`,
@@ -75,9 +85,11 @@ export async function POST(req: Request) {
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: TO_EMAIL,
+      // Replying in your inbox goes straight to the lead.
+      replyTo: email,
       subject,
       text: lines.join("\n"),
-      html: renderHtml({ name, business, city, phone, details }),
+      html: renderHtml({ name, email, business, city, phone, details }),
     });
 
     if (error) {
@@ -104,6 +116,7 @@ function str(v: FormDataEntryValue | null): string {
 
 function renderHtml(d: {
   name: string;
+  email: string;
   business: string;
   city: string;
   phone: string;
@@ -118,6 +131,7 @@ function renderHtml(d: {
   <h2 style="margin:0 0 16px;font-size:18px;">New quote request</h2>
   <table style="border-collapse:collapse;font-size:14px;">
     ${row("Name", d.name)}
+    ${row("Email", d.email)}
     ${row("Business", d.business)}
     ${row("City", d.city)}
     ${row("Phone", d.phone)}
