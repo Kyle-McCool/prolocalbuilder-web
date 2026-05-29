@@ -56,7 +56,42 @@ prolocalbuilder-web/
 - **Process steps** → `lib/site.ts` (`processSteps` export)
 - **Brand colors / type / spacing** → `tailwind.config.ts`
 
+## Quote form (Resend email)
+
+The free-quote form (`components/CTA.tsx`) posts to the server route
+`app/api/quote/route.ts`, which emails each lead to our inbox via
+[Resend](https://resend.com). The API key is server-only and never reaches the
+browser.
+
+**One-time setup:**
+
+1. Create a Resend account at <https://resend.com>.
+2. Add and verify the domain `prolocalbuilder.com`
+   (<https://resend.com/domains> → add domain → add the DNS records it shows you
+   to wherever the domain's DNS lives). Verification can take a few minutes to
+   an hour for DNS to propagate.
+3. Create an API key at <https://resend.com/api-keys> (starts with `re_`).
+4. Locally: copy `.env.example` to `.env.local` and paste the key into
+   `RESEND_API_KEY`. In production, set the same env var in your host (see below).
+
+**Env vars** (documented in `.env.example`):
+
+| Variable | Required | Default |
+|---|---|---|
+| `RESEND_API_KEY` | yes | — |
+| `QUOTE_FROM_EMAIL` | no | `ProLocalBuilder <quotes@prolocalbuilder.com>` (must be on a verified domain) |
+| `QUOTE_TO_EMAIL` | no | `hello@prolocalbuilder.com` |
+
+**Testing before the domain is verified:** set
+`QUOTE_FROM_EMAIL="ProLocalBuilder <onboarding@resend.dev>"` — Resend's shared
+test sender, which only delivers to the email you signed up with.
+
 ## Deployment
+
+> After deploying, set `RESEND_API_KEY` in the host's environment-variables
+> settings (Vercel: Project → Settings → Environment Variables; Cloudflare:
+> Pages project → Settings → Environment variables) and redeploy. Without it the
+> quote form returns a 500 and tells visitors to call.
 
 ### Option A — Vercel (recommended, free tier)
 

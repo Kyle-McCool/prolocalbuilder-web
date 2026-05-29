@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { site } from "@/lib/site";
 
-const FORMSPREE_URL = "https://formspree.io/f/xpqbglep";
-
 /**
- * Free-quote section. Posts to Formspree which forwards to our inbox.
+ * Free-quote section. Posts to our /api/quote route, which emails the lead
+ * to our inbox via Resend (see app/api/quote/route.ts).
  * Honeypot field for basic spam protection.
  */
 export function CTA() {
@@ -30,7 +29,7 @@ export function CTA() {
     setError("");
 
     try {
-      const res = await fetch(FORMSPREE_URL, {
+      const res = await fetch("/api/quote", {
         method: "POST",
         body: data,
         headers: { Accept: "application/json" },

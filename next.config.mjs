@@ -18,9 +18,9 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://api.makko.ai",
   "font-src 'self' data:",
-  "connect-src 'self' ws: wss: https://formspree.io", // ws: needed for HMR websocket in dev
+  "connect-src 'self' ws: wss:", // ws: needed for HMR websocket in dev; quote form posts to same-origin /api/quote
   "frame-ancestors 'none'",
-  "form-action 'self' https://formspree.io mailto:",
+  "form-action 'self' mailto:",
   "base-uri 'self'",
   "object-src 'none'",
 ].join("; ");
