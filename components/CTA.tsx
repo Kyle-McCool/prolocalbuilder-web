@@ -55,6 +55,42 @@ export function CTA() {
     >
       <div className="container-narrow">
         <div className="rounded-lg border border-ink-200 bg-white p-8 shadow-card-hover sm:p-10 md:p-12">
+          {submitted ? (
+            <div className="text-center">
+              <span className="label">Request received</span>
+              <h2 className="text-h2-sm md:text-h2 text-ink-900">
+                Thanks — we&apos;ve got your details.
+              </h2>
+              <p className="mt-3 text-body-lg text-ink-700">
+                We&apos;ll look over what you sent and get back to you the same
+                day, usually within a few hours.
+              </p>
+              <div className="mt-8 flex items-center justify-center gap-3 rounded-md border border-green-200 bg-green-50 p-6 text-left">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 20 20"
+                  className="h-6 w-6 flex-none text-green-600"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.4 0l-3.5-3.5a1 1 0 111.4-1.4l2.8 2.79 6.8-6.79a1 1 0 011.4 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <p className="text-body font-semibold text-green-800">
+                  Your request was sent. Can&apos;t wait to talk?{" "}
+                  <a
+                    href={site.contact.phoneHref}
+                    className="text-orange-600 underline-offset-2 hover:underline"
+                  >
+                    Call {site.contact.phone}
+                  </a>
+                </p>
+              </div>
+            </div>
+          ) : (
+          <>
           <span className="label">Free quote</span>
           <h2 className="text-h2-sm md:text-h2 text-ink-900">
             Tell us about your business.
@@ -71,23 +107,6 @@ export function CTA() {
             </a>
             .
           </p>
-
-          {submitted ? (
-            <div className="mt-8 rounded-md border border-green-200 bg-green-50 p-6 text-center">
-              <p className="text-lg font-semibold text-green-800">
-                Got it — we&apos;ll be in touch soon.
-              </p>
-              <p className="mt-2 text-body text-green-700">
-                Most quotes go out the same day. Can&apos;t wait?{" "}
-                <a
-                  href={site.contact.phoneHref}
-                  className="font-semibold text-orange-500 underline-offset-2 hover:underline"
-                >
-                  Call {site.contact.phone}
-                </a>
-              </p>
-            </div>
-          ) : (
           <form
             onSubmit={handleSubmit}
             className="mt-8 grid gap-5 text-left sm:grid-cols-2"
@@ -188,6 +207,7 @@ export function CTA() {
               </p>
             </div>
           </form>
+          </>
           )}
         </div>
       </div>
