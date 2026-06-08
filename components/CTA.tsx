@@ -4,21 +4,21 @@ import { useState } from "react";
 import { site } from "@/lib/site";
 
 /**
- * Free-quote section. Real form (name/business/city/phone/details) that
- * submits via a `mailto:` link with all fields URL-encoded as the email
- * body. Works without any backend; can be upgraded later to Formspree/
- * Resend by replacing the submit handler.
+ * Free-quote section. Posts to our /api/quote route, which emails the lead
+ * to our inbox via Resend (see app/api/quote/route.ts).
+ * Honeypot field for basic spam protection.
  */
 export function CTA() {
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
 
     // Honeypot: hidden field that humans never fill but bots do.
-    // If non-empty, silently fail to look like a normal submit to the bot.
     if (data.get("company_url")) {
       setSubmitting(true);
       setTimeout(() => setSubmitting(false), 1500);
@@ -26,26 +26,26 @@ export function CTA() {
     }
 
     setSubmitting(true);
-    // Strip CRLF from each field; mailto: encodes them but defense in depth
-    // protects future upgrades to Formspree/Resend that may not.
-    const clean = (v: FormDataEntryValue | null) =>
-      String(v || "").replace(/[\r\n]+/g, " ").slice(0, 2000);
+    setError("");
 
-    const lines = [
-      `Name: ${clean(data.get("name"))}`,
-      `Business: ${clean(data.get("business"))}`,
-      `City: ${clean(data.get("city"))}`,
-      `Phone: ${clean(data.get("phone"))}`,
-      ``,
-      `${String(data.get("details") || "").slice(0, 4000)}`,
-    ];
-    const subject = `Quote request from ${clean(data.get("name")) || "a local business"}`;
-    const body = lines.join("\n");
-    const url = `mailto:${site.contact.email}?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(body)}`;
-    window.location.href = url;
-    setTimeout(() => setSubmitting(false), 1500);
+    try {
+      const res = await fetch("/api/quote", {
+        method: "POST",
+        body: data,
+        headers: { Accept: "application/json" },
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+        form.reset();
+      } else {
+        setError("Something went wrong. Please try again or call us.");
+      }
+    } catch {
+      setError("Network error. Please try again or call us.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -55,6 +55,42 @@ export function CTA() {
     >
       <div className="container-narrow">
         <div className="rounded-lg border border-ink-200 bg-white p-8 shadow-card-hover sm:p-10 md:p-12">
+          {submitted ? (
+            <div className="text-center">
+              <span className="label">Request received</span>
+              <h2 className="text-h2-sm md:text-h2 text-ink-900">
+                Thanks — we&apos;ve got your details.
+              </h2>
+              <p className="mt-3 text-body-lg text-ink-700">
+                We&apos;ll look over what you sent and get back to you the same
+                day, usually within a few hours.
+              </p>
+              <div className="mt-8 flex items-center justify-center gap-3 rounded-md border border-green-200 bg-green-50 p-6 text-left">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 20 20"
+                  className="h-6 w-6 flex-none text-green-600"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.4 0l-3.5-3.5a1 1 0 111.4-1.4l2.8 2.79 6.8-6.79a1 1 0 011.4 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <p className="text-body font-semibold text-green-800">
+                  Your request was sent. Can&apos;t wait to talk?{" "}
+                  <a
+                    href={site.contact.phoneHref}
+                    className="text-orange-600 underline-offset-2 hover:underline"
+                  >
+                    Call {site.contact.phone}
+                  </a>
+                </p>
+              </div>
+            </div>
+          ) : (
+          <>
           <span className="label">Free quote</span>
           <h2 className="text-h2-sm md:text-h2 text-ink-900">
             Tell us about your business.
@@ -71,7 +107,6 @@ export function CTA() {
             </a>
             .
           </p>
-
           <form
             onSubmit={handleSubmit}
             className="mt-8 grid gap-5 text-left sm:grid-cols-2"
@@ -99,6 +134,15 @@ export function CTA() {
               label="Your name"
               required
               autoComplete="name"
+            />
+            <Field
+              id="quote-email"
+              name="email"
+              label="Email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="you@example.com"
             />
             <Field
               id="quote-business"
@@ -144,37 +188,27 @@ export function CTA() {
                 disabled={submitting}
                 className="btn btn-primary btn-lg btn-block disabled:opacity-60"
               >
-                {submitting ? "Opening email…" : "Send my quote request"}
+                {submitting ? "Sending…" : "Send my quote request"}
               </button>
-              <p
-                id="quote-help"
-                className="mt-3 text-body-sm text-ink-700"
-              >
-                This opens your email app with the message pre-filled. Most
-                quotes go out the same day. Slowest reply has been the next
-                morning.
-              </p>
-              <p className="mt-2 text-body-sm text-ink-700">
-                No email app set up?{" "}
+              {error && (
+                <p className="mt-3 text-body-sm font-medium text-red-600">
+                  {error}
+                </p>
+              )}
+              <p className="mt-3 text-body-sm text-ink-700">
+                Most quotes go out the same day. Prefer phone?{" "}
                 <a
                   href={site.contact.phoneHref}
                   aria-label={`Call ${site.contact.phone}`}
                   className="font-semibold text-orange-500 underline-offset-2 hover:underline"
                 >
                   Call {site.contact.phone}
-                </a>{" "}
-                or write to{" "}
-                <a
-                  href={site.contact.emailHref}
-                  aria-label={`Email ${site.contact.email}`}
-                  className="font-semibold text-orange-500 underline-offset-2 hover:underline"
-                >
-                  {site.contact.email}
-                </a>{" "}
-                directly.
+                </a>
               </p>
             </div>
           </form>
+          </>
+          )}
         </div>
       </div>
     </section>
